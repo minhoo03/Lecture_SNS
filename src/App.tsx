@@ -2,28 +2,49 @@ import {useState, useEffect} from 'react'
 
 import { RouterProvider, createBrowserRouter } from "react-router-dom"
 import Layout from './components/layout'
-import Home from './components/Home'
-import Profile from './components/Profile'
 import LoadingScreen from './components/LoadingScreen'
 
-import { createGlobalStyle } from "styled-components"
+import Home from './routes/Home'
+import Profile from './routes/Profile'
+import Login from './routes/Login'
+import CreateAccount from './routes/CreateAccount'
+import NotFound from './routes/NotFound'
+
+import { createGlobalStyle, styled } from "styled-components"
 import reset from "styled-reset"
 import { auth } from './firebase'
+import ProtectedRoute from './components/protected-route'
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: 
+    <ProtectedRoute>
+      <Layout />
+    </ProtectedRoute>
+    ,
     children: [
       {
         path: "profile",
         element: <Profile />
       },
       {
-        path: "home",
+        path: "",
         element: <Home />
       }
     ]
+  },
+  {
+    path: "/login",
+    element: <Login />
+  },
+  {
+    path: "/create-account",
+    element: <CreateAccount />
+  },
+  {
+    path: "/*",
+    element: <NotFound />
   }
 ])
 
@@ -32,6 +53,12 @@ const GlobalStyles = createGlobalStyle`
   * {
     box-sizing: border-box;
   }
+`
+
+const Wrapper = styled.div`
+  height: 100vh;
+  display: flex;
+  justify-content: center;
 `
 
 function App() {
@@ -49,12 +76,12 @@ function App() {
   }, [])
 
   return (
-    <>
+    <Wrapper>
       <GlobalStyles />
       {
         isLoading ? <LoadingScreen /> : <RouterProvider router={router} />
       }
-    </>
+    </Wrapper>
   )
 }
 
