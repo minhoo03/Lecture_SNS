@@ -1,15 +1,7 @@
-import { auth } from "../firebase"
-
 const Home = () => {
-
-    const Logout = () => {
-        // 현재 인증 인스턴스 버림
-        auth.signOut();
-    }
-
     return (
         <h1>
-            <button onClick={Logout}>Log out</button>
+            Home
         </h1>
     )
 }
