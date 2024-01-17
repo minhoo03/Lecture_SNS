@@ -12,6 +12,7 @@ import {
     Switcher
 } from "../components/auth-components"
 import { FirebaseError } from "firebase/app"
+import GithubButton from "../components/github-btn"
 
 const CreateAccount = () => {
     const navi = useNavigate();
@@ -91,6 +92,8 @@ const CreateAccount = () => {
                 Login - {""}
                 <Link to="/login">link</Link>
             </Switcher>
+
+            <GithubButton />
         </Wrapper>
     )
 }

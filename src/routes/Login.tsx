@@ -1,6 +1,8 @@
 import { useState } from "react"
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../firebase'
+
+import GithubButton from "../components/github-btn"
 
 import { Link, useNavigate } from "react-router-dom"
 import {
@@ -79,6 +81,8 @@ const Login = () => {
                 Join - {""}
                 <Link to="/create-account">Create One</Link>
             </Switcher>
+
+            <GithubButton />
         </Wrapper>
     )
 }
