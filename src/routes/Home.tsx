@@ -1,7 +1,9 @@
+import PostWriteForm from "../components/post-write-form"
+
 const Home = () => {
     return (
         <h1>
-            Home
+            <PostWriteForm />
         </h1>
     )
 }
