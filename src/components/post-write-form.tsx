@@ -99,6 +99,9 @@ const PostWriteForm = () => {
                 await updateDoc(doc, {
                     photo: url
                 })
+
+                setFeed("")
+                setFile(null)
             }
 
         } catch (e) {
