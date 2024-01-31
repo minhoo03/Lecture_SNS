@@ -1,7 +1,8 @@
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, updateDoc } from 'firebase/firestore';
 import { useState } from 'react';
 import { styled } from 'styled-components';
-import { auth, db } from '../firebase'
+import { auth, db, storage } from '../firebase'
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 const Form = styled.form`
     display: flex;
@@ -22,6 +23,21 @@ const TextArea = styled.textarea`
     }
 `
 
+const AttachFileButton = styled.label`
+  padding: 10px 0px;
+  color: #1d9bf0;
+  text-align: center;
+  border-radius: 20px;
+  border: 1px solid #1d9bf0;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+`;
+
+const AttachFileInput = styled.input`
+  display: none;
+`;
+
 const SubmitBtn = styled.input`
     background-color: #015bd6;
     color: #fff;
@@ -35,9 +51,19 @@ const SubmitBtn = styled.input`
 const PostWriteForm = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [feed, setFeed] = useState<string>("");
+
+    const [file, setFile] = useState<File | null>(null);
     
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setFeed(e.target.value)
+    }
+
+    const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { files } = e.target
+
+        if (files && files.length === 1) {
+            setFile(files[0])
+        }
     }
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -51,12 +77,30 @@ const PostWriteForm = () => {
 
         try {
             setIsLoading(true)
-            await addDoc(collection(db, "feeds"), { // db의 feeds 콜렉션에 document 추가, { 추가할 데이터 }
+            const doc = await addDoc(collection(db, "feeds"), { // db의 feeds 콜렉션에 document 추가, { 추가할 데이터 }
                 feed,
                 createdAt: Date.now(),
                 userName: user.displayName || "human",
                 userId: user.uid
             })
+
+            // 파일 유무
+            if (file) {
+                // 업로드 된 파일이 저장되는 폴더명과 파일명 지정
+                const locationRef = ref(
+                    storage, // 인스턴스
+                    `feeds/${user.uid}-${user.displayName}/${doc.id}`// feeds/각 유저의 고유 폴더/파일명
+                )
+
+                const result = await uploadBytes(locationRef, file) // 어떤 파일을 어디에 저장할 것인지
+                // promise 반환 -> 업로드 결과에 대한 참조
+                const url = await getDownloadURL(result.ref)
+
+                await updateDoc(doc, {
+                    photo: url
+                })
+            }
+
         } catch (e) {
             console.log(e)
         } finally {
@@ -68,6 +112,18 @@ const PostWriteForm = () => {
     return (
         <Form onSubmit={onSubmit}>
             <TextArea onChange={onChange} placeholder='Write...' maxLength={180} value={feed} />
+
+            <AttachFileButton htmlFor="file">
+                {file ? "Photo added" : "Add photo"}
+            </AttachFileButton>
+
+            <AttachFileInput
+                onChange={onFileChange}
+                type="file"
+                id="file"
+                accept="image/*"
+            />
+
             <SubmitBtn type="submit" value={isLoading ? "Posting..." : "Post Feed"} />
         </Form>
     )
