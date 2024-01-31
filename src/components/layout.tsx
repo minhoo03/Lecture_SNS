@@ -6,6 +6,9 @@ import HomeIcon from "../atoms/icons/HomeIcon";
 import UserIcon from "../atoms/icons/UserIcon";
 import ArrowLeftEnd from "../atoms/icons/ArrowLeftEnd";
 
+import Toast from "./Toast";
+import useToastStore from "../store/toast";
+
 
 const Wrapper = styled.div`
   display: grid;
@@ -47,6 +50,7 @@ const MenuItem = styled.div`
 
 
 export default function Layout() {
+    const { text, isShowing } = useToastStore();
     const navi = useNavigate();
 
     const onLogOut = async () => {
@@ -80,6 +84,7 @@ export default function Layout() {
                     </MenuItem>
                 </Link>
             </Menu>
+            <Toast isVisible={isShowing}>{text}</Toast>
             <Outlet />
       </Wrapper>
     )

@@ -4,6 +4,8 @@ import { styled } from 'styled-components';
 import { auth, db, storage } from '../firebase'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
+import { useToast } from '../hooks/useToast'
+
 const Form = styled.form`
     display: flex;
     flex-direction: column;
@@ -49,6 +51,7 @@ const SubmitBtn = styled.input`
 `
 
 const PostWriteForm = () => {
+    const { showToast } = useToast();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [feed, setFeed] = useState<string>("");
 
@@ -104,8 +107,10 @@ const PostWriteForm = () => {
                 setFile(null)
             }
 
+            showToast("피드가 저장되었습니다.")
         } catch (e) {
-            console.log(e)
+            // console.log(e)
+            showToast("정상적으로 진행되지 않았습니다.")
         } finally {
             // 성공/실패 상관 없이 거쳐감
             setIsLoading(false)
