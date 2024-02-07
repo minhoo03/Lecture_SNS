@@ -79,7 +79,9 @@ export default function Feed({ id, userId, feed, userName, photo }: IFeed) {
             <Column>
                 <UserName>{userName}</UserName>
                 <FeedText>{feed}</FeedText>
-                <DeleteButton onClick={handleDelete}>Delete</DeleteButton>
+                {
+                    user?.uid === userId && <DeleteButton onClick={handleDelete}>Delete</DeleteButton>
+                }
             </Column>
 
             {/* 1 그리드 */}

@@ -5,7 +5,7 @@ import styled from "styled-components";
 import Feed from "./feed";
 import { Unsubscribe } from "firebase/auth";
 
-interface IFeed {
+export interface IFeed {
     id: string;
     feed: string;
     userId: string;

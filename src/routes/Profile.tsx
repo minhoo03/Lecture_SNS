@@ -1,8 +1,11 @@
 import styled from "styled-components"
-import { auth, storage } from "../firebase"
-import React, { useState } from "react"
+import { auth, db, storage } from "../firebase"
+import React, { useEffect, useState } from "react"
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
 import { updateProfile } from "firebase/auth"
+import { IFeed } from "../components/timeline"
+import Feed from "../components/feed"
+import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore"
 
 const Wrapper = styled.div`
     display: flex;
@@ -35,9 +38,16 @@ const Name = styled.span`
     font-size: 24px;
 `
 
+const Feeds = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+`
+
 export default function Profile() {
     const user = auth.currentUser;
     const [avatar, setAvatar] = useState(user?.photoURL) // 로그인 된 유저의 사진 URL을 초기값으로 지정할 것
+    const [feeds, setFeeds] = useState<IFeed[]>([])
 
     const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const { files } = e.target;
@@ -66,6 +76,36 @@ export default function Profile() {
         }
     }
 
+    const fetchFeeds = async () => {
+        // 쿼리 작성
+        const feedQuery = query(
+            collection(db, "feeds"), // 어떤 DB
+            where("userId", "==", user?.uid), // 조건
+            orderBy("createdAt", "desc"), // 최신순
+            limit(25) // 최대 25개까지
+        )
+
+        const snapshot = await getDocs(feedQuery) // 쿼리대로 스냅샷 얻어왔고
+        const feedsData = snapshot.docs.map((doc) => {
+            const { feed, createdAt, userId, userName, photo } = doc.data();
+
+            return {
+                feed,
+                createdAt,
+                userId,
+                userName,
+                photo,
+                id: doc.id
+            }
+        })
+
+        setFeeds(feedsData)
+    }
+
+    useEffect(() => {
+        fetchFeeds()
+    }, [])
+
     return (
         <Wrapper>
             <AvatarUpload htmlFor="avatar">
@@ -91,6 +131,14 @@ export default function Profile() {
                 onChange={handleAvatarChange}
             />
             <Name>{user?.displayName ?? "어나니머스"}</Name>
+
+            <Feeds>
+                {
+                    feeds.map((feed) => (
+                        <Feed key={feed.id} {...feed} />
+                    ))
+                }
+            </Feeds>
         </Wrapper>
     )
 }
