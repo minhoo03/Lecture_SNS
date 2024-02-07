@@ -92,7 +92,7 @@ const PostWriteForm = () => {
                 // 업로드 된 파일이 저장되는 폴더명과 파일명 지정
                 const locationRef = ref(
                     storage, // 인스턴스
-                    `feeds/${user.uid}-${user.displayName}/${doc.id}`// feeds/각 유저의 고유 폴더/파일명
+                    `feeds/${user.uid}/${doc.id}`// feeds/각 유저의 고유 폴더/파일명
                 )
 
                 const result = await uploadBytes(locationRef, file) // 어떤 파일을 어디에 저장할 것인지
