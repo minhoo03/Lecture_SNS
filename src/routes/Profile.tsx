@@ -86,7 +86,7 @@ export default function Profile() {
         )
 
         const snapshot = await getDocs(feedQuery) // 쿼리대로 스냅샷 얻어왔고
-        const feedsData = snapshot.docs.map((doc) => {
+        const feedsData = snapshot.docs.map((doc) => { // 이걸 onSnapshot으로 바꿔야 업데이트 후 실시간 조회 가능
             const { feed, createdAt, userId, userName, photo } = doc.data();
 
             return {
